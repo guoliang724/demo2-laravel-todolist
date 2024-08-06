@@ -11,7 +11,7 @@ Route::get('/', function () {
 });
 
 Route::get('/tasks', function () {
-  $tasks = Task::latest()->get();
+  $tasks = Task::latest()->paginate();
   return view('index', ['tasks' => $tasks]);
 })->name('tasks.index');
 
@@ -27,8 +27,6 @@ Route::get('/tasks/{id}', function ($id) {
   $task = Task::find($id);
   return view('show', ['task' => $task]);
 })->name('tasks.show');
-
-
 
 Route::post('/tasks', function (Request $request) {
   $data = $request->validate([
@@ -66,5 +64,18 @@ Route::put('/tasks/{id}', function ($id, Request $request) {
   return redirect()->route("tasks.show", ['id' => $task->id])->with('sucess', "Task updated successfully!");
 })->name("tasks.update");
 
+Route::delete("/tasks/{id}", function ($id, Request $request) {
+  $task = Task::findOrFail($id);
+  $task->delete();
 
+  return redirect()->route("tasks.index")->with('sucess', 'Task deleted successfully');
+})->name("tasks.destory");
+
+Route::put("/tasks/{id}/toggle-complete", function ($id, Request $request) {
+
+  $task = Task::findOrFail($id);
+  $task->toggleComplete();
+
+  return redirect()->back()->with("sucess", "the task is completed");
+})->name("tasks.toggle-complete");
 // 388 
